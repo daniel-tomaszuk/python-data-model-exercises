@@ -33,6 +33,10 @@ class Taco:
 
         return super().__format__(format_spec)
 
+    def __bytes__(self) -> bytes:
+        message = "".join(hex(ord(c)) for c in self.__str__())
+        return message.encode()
+
 
 if __name__ == "__main__":
     t1 = Taco("hard", protein="chicken")
@@ -54,3 +58,6 @@ if __name__ == "__main__":
     # some additional formatting with format strings
     print("{:02d}".format(t1))
     print("{:taco}".format(t1))  # not really a good idea, but will work as long as Taco class supports it
+
+    # check out __bytes__
+    print("bytes:", bytes(t1))
