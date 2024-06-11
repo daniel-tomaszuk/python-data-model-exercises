@@ -23,7 +23,7 @@ class Point:
         return self.__sub__(other)
 
     def __isub__(self, other: Union[int, "Point"]) -> "Point":
-        # In place addition, if not defined will use regular __sub__
+        # In place subtracting, if not defined will use regular __sub__
         if isinstance(other, Point):
             self.x -= other.x
             self.y -= other.y
