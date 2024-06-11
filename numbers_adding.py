@@ -23,7 +23,7 @@ class Point:
         return self.__add__(other)
 
     def __iadd__(self, other: Union[int, "Point"]) -> "Point":
-        # In place addition, if not defined will used regular __add__
+        # In place addition, if not defined will use regular __add__
         if isinstance(other, Point):
             self.x += other.x
             self.y += other.y
