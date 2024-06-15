@@ -62,11 +62,3 @@ if __name__ == "__main__":
     print(e1_loads.title)
     print(e1_loads.save_date)
     print(e1_loads.supervisors)
-
-
-
-
-
-
-
-
