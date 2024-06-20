@@ -55,4 +55,4 @@ See how many different ideas you can use from what we covered in the last sectio
 
 ---
 
-You should also remember to test your code! In the solutions I will introduce you to Python's unittest package. Even if you skip this project, at least review that video and/or notebook if you are unfamiliar with unittest.
+You should also remember to test your code! `pytest` is used.
