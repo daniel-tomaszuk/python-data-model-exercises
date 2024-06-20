@@ -2,6 +2,7 @@ from decimal import Decimal
 
 import freezegun
 import pytest
+from pytz import timezone
 
 from oop.classes.project.accounts import Account, Transaction
 
@@ -14,7 +15,6 @@ class BaseTestCase:
 
 @freezegun.freeze_time("2024-06-01", tick=False)
 class TestTransaction(BaseTestCase):
-    @freezegun.freeze_time("2024-06-01", tick=False)
     def test_empty_transaction_creation(self):
         t1 = Transaction(
             status=Transaction.TRANSACTION_STATUS["deposit"],
@@ -53,6 +53,13 @@ class TestTransaction(BaseTestCase):
         confirmation_number: str = "D-2214123-20230923173045-231"
         transaction = Transaction.create_transaction_from_confirmation_number(confirmation_number)
         assert str(transaction) == confirmation_number
+
+    def test_transaction_datetime_utc_timezone(self):
+        t1 = Transaction(
+            status=Transaction.TRANSACTION_STATUS["deposit"],
+            amount=Decimal(10),
+        )
+        assert t1.datetime_utc.tzinfo == timezone("UTC")
 
 
 @freezegun.freeze_time("2024-06-01T12:30:45", tick=False)
@@ -192,3 +199,13 @@ class TestAccount(BaseTestCase):
         confirmation_code: str = a1.deposit_interest()
         assert confirmation_code == "I-1122334455-20240601123045-3"
         assert round(a1.balance, 4) == Decimal(26250.0000)
+
+    @freezegun.freeze_time("2024-07-01T12:30:45", tick=False)
+    def test_account_preferred_timezone(self):
+        a1 = Account(
+            account_number=1122334455, first_name="John", last_name="Doe", preferred_time_zone=timezone("CET")
+        )
+        t1 = Transaction(amount=Decimal(10000), status=Transaction.TRANSACTION_STATUS["deposit"])
+        a1.process_transaction(t1)
+
+        assert t1.local_datetime.utcoffset().seconds == 7200  # +2h offset from UTC

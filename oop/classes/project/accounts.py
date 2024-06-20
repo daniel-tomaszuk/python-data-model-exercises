@@ -1,6 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 
+import pytz
 from pytz import timezone
 
 
@@ -12,13 +13,14 @@ class Transaction:
     def __init__(self, status: str, amount: Decimal = Decimal(0)):
         self.__status = None
 
-        self.datetime_utc = datetime.now()
+        self.datetime_utc = datetime.now(tz=pytz.utc)
         self.status = status
         self.amount = amount
 
         self._account_number = None
         self._transaction_id = None
         self._account_timezone = None
+        self._local_datetime = None
 
     def __repr__(self) -> str:
         return self.confirmation_number()
@@ -58,6 +60,12 @@ class Transaction:
 
         self.__status = value
 
+    @property
+    def local_datetime(self) -> datetime:
+        if self._account_timezone:
+            return self.datetime_utc.astimezone(self._account_timezone)
+        return self.datetime_utc
+
     def fill_account_details(self, account: "Account", transaction_id: int = None):
         self._account_number = account.account_number
         self._account_timezone = account.preferred_time_zone
@@ -72,19 +80,24 @@ class Transaction:
 
 class Account:
     """Handles User account information"""
-    preferred_time_zone = timezone("CET")
-
     __existing_accounts: list[int] = list()
     __transactions_count: int = 0
     interest_rate: int = 0.05
 
-    def __init__(self, account_number: int, first_name: str, last_name: str):
+    def __init__(
+        self,
+        account_number: int,
+        first_name: str,
+        last_name: str,
+        preferred_time_zone: timezone = timezone("UTC"),
+    ):
         self._account_number = None
         self._transactions: list[Transaction] = list()
 
         self.account_number = account_number
         self.first_name = first_name
         self.last_name = last_name
+        self.preferred_time_zone = preferred_time_zone
 
     @property
     def account_number(self) -> int:
