@@ -1,3 +1,4 @@
+import itertools
 from datetime import datetime
 from decimal import Decimal
 
@@ -81,7 +82,7 @@ class Transaction:
 class Account:
     """Handles User account information"""
     __existing_accounts: list[int] = list()
-    __transactions_count: int = 0
+    __transactions_count: itertools.count = itertools.count(1)
     interest_rate: int = 0.05
 
     def __init__(
@@ -135,8 +136,7 @@ class Account:
         if transaction.status == Transaction.TRANSACTION_STATUS["withdrawal"] and self.balance < transaction.amount:
             transaction.status = Transaction.TRANSACTION_STATUS["declined"]
 
-        self.__transactions_count += 1
-        transaction.fill_account_details(account=self, transaction_id=self.__transactions_count)
+        transaction.fill_account_details(account=self, transaction_id=next(self.__transactions_count))
         self._transactions.append(transaction)
         return str(transaction)
 

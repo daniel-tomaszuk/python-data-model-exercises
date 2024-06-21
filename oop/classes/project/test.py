@@ -1,3 +1,4 @@
+import itertools
 from decimal import Decimal
 
 import freezegun
@@ -10,7 +11,7 @@ from oop.classes.project.accounts import Account, Transaction
 class BaseTestCase:
     def setup_method(*args, **kwargs):
         Account._Account__existing_accounts = []
-        Account._Account__transactions_count = 0
+        Account._Account__transactions_count = itertools.count(1)
 
 
 @freezegun.freeze_time("2024-06-01", tick=False)
