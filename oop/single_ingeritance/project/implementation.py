@@ -13,7 +13,7 @@ class Validation:
     DIED_MORE_THAN_AVAILABLE_ERROR = "It's not possible for more that total resource count to be broken."
 
     @classmethod
-    def validate_positive_integer(cls, x: int) -> int:
+    def validate_integer(cls, x: int, min_value: int | None = None) -> int:
         if not isinstance(x, int) or x <= 0:
             raise ValueError(cls.POSITIVE_INTEGER_REQUIRED_ERROR)
         return x
@@ -39,8 +39,8 @@ class Resource:
         self._name = name
         self._manufacturer = manufacturer
 
-        Validation.validate_positive_integer(total)
-        Validation.validate_positive_integer(allocated)
+        Validation.validate_integer(total)
+        Validation.validate_integer(allocated)
         if allocated > total:
             raise ValueError("Allocated count can not be higher than total count.")
 
@@ -89,7 +89,7 @@ class Resource:
         """
             Method to take n resources from the pool (as long as inventory is available)
         """
-        Validation.validate_positive_integer(count)
+        Validation.validate_integer(count)
         Validation.validate_condition(
             self.available,
             count,
@@ -103,7 +103,7 @@ class Resource:
         """
             Method to return n resources to the pool (e.g. disassembled some builds)
         """
-        Validation.validate_positive_integer(count)
+        Validation.validate_integer(count)
         Validation.validate_condition(
             self._allocated,
             count,
@@ -118,7 +118,7 @@ class Resource:
             Method to return and permanently remove inventory from the pool
             (e.g. they broke something) - as long as total available allows it
         """
-        Validation.validate_positive_integer(count)
+        Validation.validate_integer(count)
         Validation.validate_condition(
             self.total,
             count,
@@ -134,7 +134,7 @@ class Resource:
         """
             Method to add inventory to the pool (e.g. they purchased a new CPU)
         """
-        Validation.validate_positive_integer(count)
+        Validation.validate_integer(count)
         self._total += count
 
 
@@ -153,9 +153,9 @@ class CPU(Resource):
     ):
         super().__init__(name, manufacturer, total, allocated)
 
-        self._cores = Validation.validate_positive_integer(cores)
+        self._cores = Validation.validate_integer(cores)
         self._socket = socket
-        self._power_watts = Validation.validate_positive_integer(power_watts)
+        self._power_watts = Validation.validate_integer(power_watts)
 
     @property
     def cores(self) -> int:
@@ -180,7 +180,7 @@ class Storage(Resource):
         capacity_gb: int,
     ):
         super().__init__(name, manufacturer, total, allocated)
-        self._capacity_gb = Validation.validate_positive_integer(capacity_gb)
+        self._capacity_gb = Validation.validate_integer(capacity_gb)
 
     @property
     def capacity_gb(self) -> int:

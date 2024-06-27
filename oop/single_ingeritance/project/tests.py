@@ -32,9 +32,9 @@ class TestValidators:
             -1, 0, 2.25, -2.25, "2", "-2", None, [], {}, (), "abcd",
         ]
     )
-    def test_validate_positive_integer__raises_error(self, invalid_value):
+    def test_validate_integer__raises_error(self, invalid_value):
         with pytest.raises(ValueError) as e:
-            Validation.validate_positive_integer(invalid_value)
+            Validation.validate_integer(invalid_value)
         assert e.value.args[0] == Validation.POSITIVE_INTEGER_REQUIRED_ERROR
 
     @pytest.mark.parametrize(
@@ -42,8 +42,8 @@ class TestValidators:
             1, 2, 10, 50, 100,
         ]
     )
-    def test_validate_positive_integer__success(self, allowed_value):
-        Validation.validate_positive_integer(allowed_value)
+    def test_validate_integer__success(self, allowed_value):
+        Validation.validate_integer(allowed_value)
 
     @pytest.mark.parametrize(
         "x,y,condition_operator", [
@@ -81,6 +81,29 @@ class TestResource(BaseTestCase):
         )
 
     def test_resource_creation__allocated_higher_than_total(self, default_resource_data: dict):
+        default_resource_data = {
+            **default_resource_data,
+            "allocated": default_resource_data["total"] + 1,
+        }
+        with pytest.raises(ValueError) as e:
+            Resource(**default_resource_data)
+
+        assert e.value.args[0] == "Allocated count can not be higher than total count."
+
+    @pytest.mark.parametrize(
+        "total,allocated", [
+            (-1, 2),
+            (0, 2),
+            (2.25, 2),
+            (2, -1),
+            (2, 0),
+            (2, 1.25),
+            (2, 5),
+        ]
+    )
+    def test_resource_creation__total_and_allocated_invalid_values(
+            self, default_resource_data: dict, total: int, allocated: int,
+    ):
         default_resource_data = {
             **default_resource_data,
             "allocated": default_resource_data["total"] + 1,
