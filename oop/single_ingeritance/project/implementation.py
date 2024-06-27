@@ -38,9 +38,14 @@ class Resource:
     ):
         self._name = name
         self._manufacturer = manufacturer
+
+        Validation.validate_positive_integer(total)
+        Validation.validate_positive_integer(allocated)
+        if allocated > total:
+            raise ValueError("Allocated count can not be higher than total count.")
+
         self._total = total
         self._allocated = allocated
-
 
     @property
     def name(self) -> str:

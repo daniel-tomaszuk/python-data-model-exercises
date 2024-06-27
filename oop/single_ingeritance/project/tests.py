@@ -80,6 +80,16 @@ class TestResource(BaseTestCase):
             for key in default_resource_data.keys()
         )
 
+    def test_resource_creation__allocated_higher_than_total(self, default_resource_data: dict):
+        default_resource_data = {
+            **default_resource_data,
+            "allocated": default_resource_data["total"] + 1,
+        }
+        with pytest.raises(ValueError) as e:
+            Resource(**default_resource_data)
+
+        assert e.value.args[0] == "Allocated count can not be higher than total count."
+
     def test_resource_str(self, default_resource_data):
         resource = Resource(**default_resource_data)
         assert str(resource) == resource.name
