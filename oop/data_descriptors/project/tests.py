@@ -7,7 +7,11 @@ from data_descriptors.project.project import IntegerField, CharField
 class TestValidFields:
 
     @pytest.fixture
-    def test_class(self):
+    def test_class(self, min_value: int = None, max_value: int = None):
+
+        # other way to do it - use `type` class factory
+        # return type("DummyTestClass", (), dict(min_value=min_value, max_value=max_value))
+
         class DummyTestClass:
             integer_field = IntegerField()
             integer_field_with_boundaries = IntegerField(min_value=-10, max_value=10)
